@@ -5,7 +5,9 @@
 [<img src="http://img.shields.io/badge/DeepSpeech2-passing-success">](https://sooftware.github.io/KoSpeech/) 
 [<img src="http://img.shields.io/badge/ListenAttendSpell-passing-success">](https://sooftware.github.io/KoSpeech/) 
 [<img src="http://img.shields.io/badge/SpeechTransformer-passing-success">](https://sooftware.github.io/KoSpeech/) 
-[<img src="http://img.shields.io/badge/JointCTCAttention-passing-success">](https://sooftware.github.io/KoSpeech/)  
+[<img src="http://img.shields.io/badge/JointCTCAttentionListenAttendSpell-passing-success">](https://sooftware.github.io/KoSpeech/)
+[<img src="http://img.shields.io/badge/JointCTCAttentionSpeechTransformer-passing-success">](https://sooftware.github.io/KoSpeech/)
+[<img src="http://img.shields.io/badge/Jasper-In Implementation-informational">](https://sooftware.github.io/KoSpeech/)
   
 ### What's New
 
