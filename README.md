@@ -33,14 +33,16 @@
   
 ### [UPDATED] Pre-train Models
   
-|Description|Feature|Dataset|Epochs|CER|Model|  
-|-----------|:-----:|-------|:----:|:-:|-----|    
-|Deep Speech 2|Kaldi-style fbank 80|[KsponSpeech](http://www.aihub.or.kr/aidata/105)|1|42.3|[download](https://drive.google.com/file/d/1MMqZMjEuc5wvFNIxfhCkhn1kG3Z0HaEx/view?usp=sharing)|  
-|Listen, Attend and Spell|Kaldi-style fbank 80|[KsponSpeech](http://www.aihub.or.kr/aidata/105)|1|19.2|[download](https://drive.google.com/file/d/17q2qg23ud-Kebsa0Fy4DEpA2Uy6rlT90/view?usp=sharing)|  
-|Joint CTC-Attention|Kaldi-style fbank 80|[KsponSpeech](http://www.aihub.or.kr/aidata/105)|10|12.5|[download](https://drive.google.com/file/d/1DDclNR4BInOXvWOJphajkG4jDf8KCa_W/view?usp=sharing)|  
+|Description|Loss|Feature|Dataset|Epochs|CER|Model|  
+|-----------|----|:-----:|-------|:----:|:-:|-----|    
+|Transformer (12-6)|Joint CTC-CrossEntropy|Kaldi-style fbank 80|[KsponSpeech](https://www.mdpi.com/2076-3417/10/19/6936)|3|15.4|[download](https://drive.google.com/file/d/1Te6K12KDw59PPRnvrM8xZPhxRYH3GYuy/view?usp=sharing)|   
+|Listen Attend Spell|-|CrossEntropy|[KsponSpeech](https://www.mdpi.com/2076-3417/10/19/6936)|-|-|will be upload|  
+|Joint CTC-Attention Listen Attend Spell|Joint CTC-CrossEntropy|-|[KsponSpeech](https://www.mdpi.com/2076-3417/10/19/6936)|-|-|will be upload|  
+|Deep Speech 2|CTC|-|[KsponSpeech](https://www.mdpi.com/2076-3417/10/19/6936)|-|-|will be upload|  
+|Jasper|CTC|-|[KsponSpeech](https://www.mdpi.com/2076-3417/10/19/6936)|-|-|will be upload|  
 |VAD Model|-|-|-|-|[download](https://drive.google.com/file/d/14lLxfCiFgXqnb1a8dZ_AYhlKQeaMz7Jd/view?usp=sharing)|  
   
-※ Training is in progress. As the training progresses, the pre-trained model will be updated.
+※ Training is in progress. As the training progresses, the pre-trained model will be updated.  
   
 ### Pre-processed Transcripts
   
@@ -51,7 +53,8 @@
 |KsponSpeech|*Required*    |Grapheme   |[download](https://drive.google.com/file/d/1awhfTpqAaDs7K5R9npvFoqeMYWiUtGtq/view?usp=sharing)|   
 |LibriSpeech|*Unrequired*  |Subword    |[download](https://drive.google.com/file/d/1RA29SLtNIo1zmnk0OgVeXNH553Ul_DhY/view?usp=sharing)|  
    
-※ Authentication : Refer to [[Link]](https://github.com/sooftware/KoSpeech/issues/54)  
+※ KsponSpeech needs permission from. [AI Hub](https://aihub.or.kr/). Please send the approved screenshot to sh951011@gmail.com.  
+* It may be slow to reply, so it is recommended to execute [preprocessing code](https://github.com/sooftware/KoSpeech/tree/master/dataset/kspon).
   
 ## Introduction
   
