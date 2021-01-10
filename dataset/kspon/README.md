@@ -1,5 +1,5 @@
 # KsponSpeech-preprocess
-#### Pre-processing KsponSpeech corpus priveded by AI Hub
+#### Pre-processing KsponSpeech corpus
    
 It's been a while since KsponSpeech was released, but it's hard to compare performance because there's no established preprocessing method. So we're revealing the pre-processing method we used in the [KoSpeech](https://github.com/sooftware/KoSpeech) project. This project provides processing in characters, subwords, and grapheme units.    
   
