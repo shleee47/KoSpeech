@@ -37,7 +37,7 @@
 |-----------|----|:-----:|-------|:----:|:-:|-----|    
 |Transformer (12-6)|Joint CTC-CrossEntropy|Kaldi-style fbank 80|[KsponSpeech](https://www.mdpi.com/2076-3417/10/19/6936)|3|15.4|[download](https://drive.google.com/file/d/1Te6K12KDw59PPRnvrM8xZPhxRYH3GYuy/view?usp=sharing)|   
 |Listen Attend Spell|CrossEntropy|-|[KsponSpeech](https://www.mdpi.com/2076-3417/10/19/6936)|-|-|will be upload|  
-|Joint CTC-Attention Listen Attend Spell|Joint CTC-CrossEntropy|-|[KsponSpeech](https://www.mdpi.com/2076-3417/10/19/6936)|-|-|will be upload|  
+|Listen Attend Spell|Joint CTC-CrossEntropy|-|[KsponSpeech](https://www.mdpi.com/2076-3417/10/19/6936)|-|-|will be upload|  
 |Deep Speech 2|CTC|-|[KsponSpeech](https://www.mdpi.com/2076-3417/10/19/6936)|-|-|will be upload|  
 |Jasper|CTC|-|[KsponSpeech](https://www.mdpi.com/2076-3417/10/19/6936)|-|-|will be upload|  
 |VAD Model|-|-|-|-|-|[download](https://drive.google.com/file/d/14lLxfCiFgXqnb1a8dZ_AYhlKQeaMz7Jd/view?usp=sharing)|  
