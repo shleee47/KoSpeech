@@ -21,6 +21,7 @@ from kospeech.models.modules import Transpose, Linear
 
 
 class EncoderInterface(nn.Module):
+    """ Base Interface of Encoder """
     def __init__(self):
         super(EncoderInterface, self).__init__()
 
@@ -68,9 +69,9 @@ class BaseEncoder(EncoderInterface):
             assert dropout_p, "If `joint_ctc_attention` True, `dropout_p` should be not None"
             assert d_model, "If `joint_ctc_attention` True, `d_model` should be not None"
 
-        if extractor:
+        if extractor is not None:
             extractor = self.supported_extractors[extractor.lower()]
-            self.conv = extractor(input_dim, activation=activation)
+            self.conv = extractor(input_dim=input_dim, activation=activation)
 
         self.conv_output_dim = self.conv.get_output_dim()
         self.num_classes = num_classes
@@ -114,7 +115,9 @@ class TransducerEncoder(EncoderInterface):
                 `FloatTensor` of size ``(batch, seq_length, dimension)``.
             input_lengths (torch.LongTensor): The length of input tensor. ``(batch)``
         Returns:
-            * encoder_outputs (torch.FloatTensor): A output sequence of encoder. `FloatTensor` of size
+            (Tensor, Tensor)
+            * outputs (torch.FloatTensor): A output sequence of encoder. `FloatTensor` of size
                 ``(batch, seq_length, dimension)``
+            * output_lengths (torch.LongTensor): The length of output tensor. ``(batch)``
         """
         raise NotImplementedError
