@@ -16,10 +16,9 @@ import torch
 import torch.nn as nn
 from torch import Tensor
 from typing import Optional, Tuple
+from kospeech.models.model import EncoderDecoderModel
 
-from kospeech.models.interface import EncoderDecoderModelInterface
-
-class ListenAttendSpell(EncoderDecoderModelInterface):
+class ListenAttendSpell(EncoderDecoderModel):
     """
     Listen, Attend and Spell model with configurable encoder and decoder.
 
