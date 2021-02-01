@@ -12,7 +12,9 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from torch import Tensor
+from kospeech.models.model import TransducerModel
+from kospeech.models.rnnt.decoder import DecoderRNNT
+from kospeech.models.rnnt.encoder import EncoderRNNT
 
 from kospeech.models.interface import TransducerInterface
 
