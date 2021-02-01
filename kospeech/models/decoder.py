@@ -69,4 +69,28 @@ class TransducerDecoder(DecoderInterface):
         super(TransducerDecoder, self).__init__()
 
     def forward(self, inputs: Tensor, input_lengths: Tensor) -> Tuple[Tensor, Tensor]:
+        """
+        Forward propage a `inputs` (targets) for training.
+        Args:
+            inputs (torch.LongTensor): A target sequence passed to decoder. `IntTensor` of size ``(batch, seq_length)``
+            input_lengths (torch.LongTensor): The length of input tensor. ``(batch)``
+        Returns:
+            (Tensor, Tensor):
+            * decoder_outputs (torch.FloatTensor): A output sequence of decoder. `FloatTensor` of size
+                ``(batch, seq_length, dimension)``
+            * hidden_states (torch.FloatTensor): A hidden state of decoder. `FloatTensor` of size
+                ``(batch, seq_length, dimension)``
+        """
         raise NotImplementedError
+© 2021 GitHub, Inc.
+Terms
+Privacy
+Security
+Status
+Docs
+Contact GitHub
+Pricing
+API
+Training
+Blog
+About
