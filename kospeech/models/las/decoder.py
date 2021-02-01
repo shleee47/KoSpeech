@@ -32,19 +32,17 @@ class DecoderRNN(BaseDecoder):
     """
     Converts higher level features (from encoder) into output utterances
     by specifying a probability distribution over sequences of characters.
-
     Args:
         num_classes (int): number of classification
-        max_length (int): a maximum allowed length for the sequence to be processed
-        hidden_state_dim (int): dimension of RNN`s hidden state vector
-        sos_id (int): index of the start of sentence symbol
-        eos_id (int): index of the end of sentence symbol
-        attn_mechanism (str): type of attention mechanism (default: dot)
-        num_heads (int): number of attention heads. (default: 4)
-        num_layers (int, optional): number of recurrent layers (default: 1)
+        hidden_state_dim (int): the number of features in the decoder hidden state `h`
+        num_layers (int, optional): number of recurrent layers (default: 2)
         rnn_type (str, optional): type of RNN cell (default: lstm)
-        dropout_p (float, optional): dropout probability (default: 0.3)
-
+        pad_id (int, optional): index of the pad symbol (default: 0)
+        sos_id (int, optional): index of the start of sentence symbol (default: 1)
+        eos_id (int, optional): index of the end of sentence symbol (default: 2)
+        attn_mechanism (str, optional): type of attention mechanism (default: multi-head)
+        num_heads (int, optional): number of attention heads. (default: 4)
+        dropout_p (float, optional): dropout probability of decoder (default: 0.2)
     Inputs: inputs, encoder_outputs, teacher_forcing_ratio
         - **inputs** (batch, seq_len, input_size): list of sequences, whose length is the batch size and within which
           each sequence is a list of token IDs.  It is used for teacher forcing when provided. (default `None`)
@@ -53,7 +51,6 @@ class DecoderRNN(BaseDecoder):
         - **teacher_forcing_ratio** (float): The probability that teacher forcing will be used. A random number is
           drawn uniformly from 0-1 for every decoding token, and if the sample is smaller than the given value,
           teacher forcing would be used (default is 0).
-
     Returns: predicted_log_probs
         - **predicted_log_probs**: list contains decode result (log probability)
     """
@@ -65,17 +62,17 @@ class DecoderRNN(BaseDecoder):
 
     def __init__(
             self,
-            num_classes: int,                        # number of classfication
-            max_length: int = 150,                   # a maximum allowed length for the sequence to be processed
-            hidden_state_dim: int = 1024,            # dimension of RNN`s hidden state vector
-            pad_id: int = 0,                         # pad token`s id
-            sos_id: int = 1,                         # start of sentence token`s id
-            eos_id: int = 2,                         # end of sentence token`s id
-            attn_mechanism: str = 'multi-head',      # type of attention mechanism
-            num_heads: int = 4,                      # number of attention heads
-            num_layers: int = 2,                     # number of RNN layers
-            rnn_type: str = 'lstm',                  # type of RNN cell
-            dropout_p: float = 0.3,                  # dropout probability
+            num_classes: int,
+            max_length: int = 150,
+            hidden_state_dim: int = 1024,
+            pad_id: int = 0,
+            sos_id: int = 1,
+            eos_id: int = 2,
+            attn_mechanism: str = 'multi-head',
+            num_heads: int = 4,
+            num_layers: int = 2,
+            rnn_type: str = 'lstm',
+            dropout_p: float = 0.3,
     ) -> None:
         super(DecoderRNN, self).__init__()
         self.hidden_state_dim = hidden_state_dim
@@ -99,7 +96,7 @@ class DecoderRNN(BaseDecoder):
             dropout=dropout_p,
             bidirectional=False,
         )
-        
+
         if self.attn_mechanism == 'loc':
             self.attention = LocationAwareAttention(hidden_state_dim, attn_dim=hidden_state_dim, smoothing=False)
         elif self.attn_mechanism == 'multi-head':
@@ -152,8 +149,17 @@ class DecoderRNN(BaseDecoder):
             targets: Optional[Tensor],
             encoder_outputs: Tensor,
             teacher_forcing_ratio: float = 1.0,
-    ) -> list:
-
+    ) -> Tensor:
+        """
+        Forward propagate a `encoder_outputs` for training.
+        Args:
+            targets (torch.LongTensr): A target sequence passed to decoder. `IntTensor` of size ``(batch, seq_length)``
+            encoder_outputs (torch.FloatTensor): A output sequence of encoder. `FloatTensor` of size
+                ``(batch, seq_length, dimension)``
+            teacher_forcing_ratio (float): ratio of teacher forcing
+        Returns:
+            * predicted_log_probs (torch.FloatTensor): Log probability of model predictions.
+        """
         hidden_states, attn = None, None
         predicted_log_probs = list()
 
@@ -161,7 +167,6 @@ class DecoderRNN(BaseDecoder):
         use_teacher_forcing = True if random.random() < teacher_forcing_ratio else False
 
         if use_teacher_forcing:
-            inputs = inputs[inputs != self.eos_id].view(batch_size, -1)
             targets = targets[targets != self.eos_id].view(batch_size, -1)
 
             if self.attn_mechanism == 'loc' or self.attn_mechanism == 'additive':
@@ -200,6 +205,8 @@ class DecoderRNN(BaseDecoder):
                 predicted_log_probs.append(step_outputs)
                 input_var = predicted_log_probs[-1].topk(1)[1]
 
+        predicted_log_probs = torch.stack(predicted_log_probs, dim=1)
+
         return predicted_log_probs
 
     @torch.no_grad()
@@ -214,7 +221,7 @@ class DecoderRNN(BaseDecoder):
             * predicted_log_probs (torch.FloatTensor): Log probability of model predictions.
         """
         hidden_states, attn = None, None
-        predicted_log_probs = list()
+        outputs = list()
 
         batch_size = encoder_outputs.size(0)
         input_var = LongTensor([self.sos_id] * batch_size).view(batch_size, 1)
@@ -229,10 +236,10 @@ class DecoderRNN(BaseDecoder):
                 encoder_outputs=encoder_outputs,
                 attn=attn,
             )
-            predicted_log_probs.append(step_outputs)
-            input_var = predicted_log_probs[-1].topk(1)[1]
+            input_var = step_outputs.topk(1)[1]
+            outputs.append(input_var)
 
-        outputs = torch.stack(predicted_log_probs, dim=1)
+        outputs = torch.stack(outputs, dim=1).squeeze(2)
 
         return outputs
 
@@ -245,7 +252,7 @@ class DecoderRNN(BaseDecoder):
         """ Validate arguments """
         assert encoder_outputs is not None
         batch_size = encoder_outputs.size(0)
-        
+
         if targets is None:  # inference
             targets = LongTensor([self.sos_id] * batch_size).view(batch_size, 1)
             max_length = self.max_length
@@ -260,7 +267,6 @@ class DecoderRNN(BaseDecoder):
             max_length = targets.size(1) - 1  # minus the start of sequence symbol
 
         return targets, batch_size, max_length
-
 
 
 class BeamDecoderRNN(BaseDecoder):
@@ -286,7 +292,7 @@ class BeamDecoderRNN(BaseDecoder):
         repeat_dims[dim] *= n_repeat
 
         return tensor.repeat(*repeat_dims)
-    
+
     def forward_step(
             self,
             input_var: Tensor,
