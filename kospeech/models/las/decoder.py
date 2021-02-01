@@ -18,7 +18,7 @@ import torch.nn as nn
 from torch import Tensor, LongTensor
 from typing import Optional, Any, Tuple
 
-from kospeech.models.interface import DecoderInterface
+from kospeech.models.decoder import BaseDecoder
 from kospeech.models.modules import Linear, View
 from kospeech.models.attention import (
     LocationAwareAttention,
@@ -28,7 +28,7 @@ from kospeech.models.attention import (
 )
 
 
-class DecoderRNN(DecoderInterface):
+class DecoderRNN(BaseDecoder):
     """
     Converts higher level features (from encoder) into output utterances
     by specifying a probability distribution over sequences of characters.
@@ -263,7 +263,7 @@ class DecoderRNN(DecoderInterface):
 
 
 
-class BeamDecoderRNN(DecoderInterface):
+class BeamDecoderRNN(BaseDecoder):
     """ Beam Search Decoder RNN """
     def __init__(self, decoder: DecoderRNN, beam_size: int, batch_size: int):
         super(BeamDecoderRNN, self).__init__()
