@@ -382,14 +382,12 @@ class SupervisedTrainer(object):
             else:
                 model.flatten_parameters()
 
-            decoder_outputs, encoder_log_probs, encoder_output_lengths = model(
+            outputs, encoder_output_lengths, encoder_log_probs = model(
                 inputs=inputs,
                 input_lengths=input_lengths,
                 targets=targets,
                 teacher_forcing_ratio=teacher_forcing_ratio
             )
-
-            outputs = torch.stack(decoder_outputs, dim=1).to(self.device)
 
             if isinstance(self.criterion, LabelSmoothedCrossEntropyLoss):
                 loss = self.criterion(
@@ -407,7 +405,7 @@ class SupervisedTrainer(object):
                 raise ValueError(f"Unsupported Criterion: {self.criterion}")
 
         elif self.architecture == 'transformer':
-            outputs, encoder_log_probs, encoder_output_lengths = model(inputs, input_lengths, targets)
+            outputs, encoder_output_lengths, encoder_log_probs = model(inputs, input_lengths, targets)
             if isinstance(self.criterion, LabelSmoothedCrossEntropyLoss):
                 loss = self.criterion(
                     outputs.contiguous().view(-1, outputs.size(-1)), targets[:, 1:].contiguous().view(-1)
