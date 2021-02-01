@@ -11,13 +11,14 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+
 import torch
 import torch.nn as nn
 from torch import Tensor
 from typing import Optional, Tuple
 
-from kospeech.models.interface import DecoderInterface
 from kospeech.models.attention import MultiHeadAttention
+from kospeech.models.decoder import BaseDecoder
 from kospeech.models.modules import Linear, LayerNorm
 from kospeech.models.transformer.sublayers import PositionwiseFeedForward
 from kospeech.models.transformer.embeddings import (
@@ -67,10 +68,12 @@ class TransformerDecoderLayer(nn.Module):
         inputs = self.self_attention_prenorm(inputs)
         outputs, self_attn = self.self_attention(inputs, inputs, inputs, self_attn_mask)
         outputs += residual
+
         residual = outputs
         outputs = self.encoder_attention_prenorm(outputs)
         outputs, encoder_attn = self.encoder_attention(outputs, encoder_outputs, encoder_outputs, encoder_outputs_mask)
         outputs += residual
+
         residual = outputs
         outputs = self.feed_forward_prenorm(outputs)
         outputs = self.feed_forward(outputs)
@@ -79,7 +82,7 @@ class TransformerDecoderLayer(nn.Module):
         return outputs, self_attn, encoder_attn
 
 
-class TransformerDecoder(DecoderInterface):
+class TransformerDecoder(BaseDecoder):
     """
     The TransformerDecoder is composed of a stack of N identical layers.
     Each layer has three sub-layers. The first is a multi-head self-attention mechanism,
@@ -116,6 +119,7 @@ class TransformerDecoder(DecoderInterface):
         self.pad_id = pad_id
         self.sos_id = sos_id
         self.eos_id = eos_id
+
         self.embedding = Embedding(num_classes, pad_id, d_model)
         self.positional_encoding = PositionalEncoding(d_model)
         self.input_dropout = nn.Dropout(p=dropout_p)
@@ -125,16 +129,25 @@ class TransformerDecoder(DecoderInterface):
                 num_heads=num_heads,
                 d_ff=d_ff,
                 dropout_p=dropout_p,
-            for _ in range(num_layers)
+            ) for _ in range(num_layers)
         ])
         self.fc = nn.Sequential(
             LayerNorm(d_model),
-            Linear(d_model, num_classes, bias=False)
+            Linear(d_model, num_classes, bias=False),
         )
 
     def forward(self, targets: Tensor, encoder_outputs: Tensor, encoder_output_lengths: Tensor) -> Tensor:
+        """
+        Forward propagate a `encoder_outputs` for training.
+        Args:
+            targets (torch.LongTensr): A target sequence passed to decoder. `IntTensor` of size ``(batch, seq_length)``
+            encoder_outputs (torch.FloatTensor): A output sequence of encoder. `FloatTensor` of size
+                ``(batch, seq_length, dimension)``
+            encoder_output_lengths: The length of encoder outputs. ``(batch)``
+        Returns:
+            * predicted_log_probs (torch.FloatTensor): Log probability of model predictions.
+        """
         batch_size = targets.size(0)
-
         targets = targets[targets != self.eos_id].view(batch_size, -1)
         target_length = targets.size(1)
 
@@ -155,7 +168,6 @@ class TransformerDecoder(DecoderInterface):
         predicted_log_probs = self.fc(outputs).log_softmax(dim=-1)
 
         return predicted_log_probs
-
 
     @torch.no_grad()
     def decode(self, encoder_outputs: Tensor, encoder_output_lengths: Tensor) -> Tensor:
