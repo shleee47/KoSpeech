@@ -1,3 +1,4 @@
+  
 import torch
 import torch.nn as nn
 
@@ -15,8 +16,11 @@ model = nn.DataParallel(Conformer(
     num_classes=10,
     input_dim=dim,
     encoder_dim=512,
-    num_layers=3,
+    num_encoder_layers=3,
     device=device,
 )).to(device)
 
 outputs = model.module.recognize(inputs, input_lengths)
+print(outputs)
+print(outputs.size())
+print("PASS")
