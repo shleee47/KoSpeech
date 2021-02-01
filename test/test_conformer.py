@@ -13,7 +13,8 @@ model = nn.DataParallel(Conformer(
     num_classes=10,
     input_dim=dim,
     encoder_dim=32,
-    num_layers=3,
+    num_encoder_layers=3,
+    decoder_dim=32,
     device=device,
 )).to(device)
 
