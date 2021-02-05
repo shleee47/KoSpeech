@@ -287,7 +287,6 @@ A [technical report](https://arxiv.org/abs/2009.03092) on KoSpeech is available.
 |-----------|--------------|-----------|:--------:|-------------------|  
 |Transformer| smoothedCE  |6  |15.12| inference problem |  
 |Transformer|CTC + smoothedCE  |2  |41.48|  |  
-|Large Conformer|smoothedCE  | 0  | |   | 
+|Large Conformer|smoothedCE  |   | |   | 
 |RNN-T|   |  ||  |  
-validation code 부분 점검 필요  
 
